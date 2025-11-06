@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PlayerSide, GameState, Move, Position } from '@/lib/xiangqi/types';
 import { createInitialBoard, copyBoard } from '@/lib/xiangqi/board';
 import { getValidMoves, isInCheck } from '@/lib/xiangqi/moves';
@@ -9,10 +10,12 @@ import { RulesDialog } from '@/components/game/RulesDialog';
 import { GameOverDialog } from '@/components/game/GameOverDialog';
 import { SideSelection } from '@/components/game/SideSelection';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 const STORAGE_KEY = 'xiangqi-stats';
 
 const Index = () => {
+  const navigate = useNavigate();
   const [playerSide, setPlayerSide] = useState<PlayerSide | null>(null);
   const [gameState, setGameState] = useState<GameState>({
     board: createInitialBoard(),
@@ -303,6 +306,19 @@ const Index = () => {
               losses={losses}
             />
           </div>
+        </div>
+
+        <div className="mt-6 flex justify-center">
+          <Button 
+            onClick={() => {
+              setPlayerSide(null);
+              handleRestart();
+            }} 
+            variant="outline"
+            className="bg-green-100 hover:bg-green-200 border-green-300 text-green-800"
+          >
+            返回首頁
+          </Button>
         </div>
 
         <RulesDialog open={showRules} onOpenChange={setShowRules} />
