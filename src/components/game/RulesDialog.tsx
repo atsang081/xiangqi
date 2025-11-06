@@ -15,66 +15,66 @@ interface RulesDialogProps {
 export function RulesDialog({ open, onOpenChange }: RulesDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">How to Play Chinese Chess</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl font-bold">象棋遊戲規則</DialogTitle>
           <DialogDescription>
-            Learn the basics of Xiangqi and become a master!
+            學習象棋基礎，成為高手！
           </DialogDescription>
         </DialogHeader>
         
         <ScrollArea className="max-h-[60vh] pr-4">
-          <div className="space-y-4 text-sm">
+          <div className="space-y-4 text-sm sm:text-base">
             <section>
-              <h3 className="font-bold text-lg mb-2">Goal</h3>
-              <p>Capture the opponent's General (帥/將) to win the game!</p>
+              <h3 className="font-bold text-base sm:text-lg mb-2">遊戲目標</h3>
+              <p>將死對方的將（帥）即可獲勝！</p>
             </section>
 
             <section>
-              <h3 className="font-bold text-lg mb-2">The Pieces</h3>
+              <h3 className="font-bold text-base sm:text-lg mb-2">棋子介紹</h3>
               <ul className="space-y-2">
                 <li>
-                  <strong>General (帥/將):</strong> Moves one space at a time within the palace. Cannot face the opponent's General directly.
+                  <strong>將（帥）：</strong>在九宮內每次移動一格，不能與對方的將（帥）面對面。
                 </li>
                 <li>
-                  <strong>Advisor (仕/士):</strong> Moves one space diagonally within the palace.
+                  <strong>士（仕）：</strong>在九宮內沿斜線移動一格。
                 </li>
                 <li>
-                  <strong>Elephant (相/象):</strong> Moves exactly two spaces diagonally. Cannot cross the river or jump over pieces.
+                  <strong>象（相）：</strong>沿斜線移動兩格，不能過河，也不能越子。
                 </li>
                 <li>
-                  <strong>Horse (馬):</strong> Moves in an "L" shape (2 spaces in one direction, 1 space perpendicular). Can be blocked if a piece is adjacent.
+                  <strong>馬：</strong>走「日」字形，如果相鄰位置有棋子則會被蹩腳。
                 </li>
                 <li>
-                  <strong>Chariot (車):</strong> Moves any number of spaces horizontally or vertically. Cannot jump over pieces.
+                  <strong>車：</strong>橫豎直線移動任意格數，不能越子。
                 </li>
                 <li>
-                  <strong>Cannon (炮/砲):</strong> Moves like a chariot but must jump over exactly one piece to capture.
+                  <strong>炮（砲）：</strong>移動方式與車相同，但吃子時必須跳過一個棋子。
                 </li>
                 <li>
-                  <strong>Soldier (兵/卒):</strong> Moves one space forward. After crossing the river, can also move sideways.
+                  <strong>兵（卒）：</strong>只能向前移動一格，過河後可以左右移動。
                 </li>
               </ul>
             </section>
 
             <section>
-              <h3 className="font-bold text-lg mb-2">Special Rules</h3>
+              <h3 className="font-bold text-base sm:text-lg mb-2">特殊規則</h3>
               <ul className="space-y-2 list-disc list-inside">
-                <li>The <strong>River</strong> divides the board in the middle</li>
-                <li>The <strong>Palace</strong> is the 3×3 area where the General and Advisors must stay</li>
-                <li>Elephants cannot cross the river</li>
-                <li>The two Generals cannot face each other directly on the same file</li>
+                <li><strong>楚河漢界</strong>將棋盤分為兩半</li>
+                <li><strong>九宮</strong>是將（帥）和士（仕）的活動範圍</li>
+                <li>象（相）不能過河</li>
+                <li>雙方的將（帥）不能在同一直線上面對面</li>
               </ul>
             </section>
 
             <section>
-              <h3 className="font-bold text-lg mb-2">Tips for Beginners</h3>
+              <h3 className="font-bold text-base sm:text-lg mb-2">新手提示</h3>
               <ul className="space-y-2 list-disc list-inside">
-                <li>Protect your General with Advisors and Elephants</li>
-                <li>Use Chariots and Cannons for powerful attacks</li>
-                <li>Advance your Soldiers across the river for more flexibility</li>
-                <li>Watch out for Horse blocks and Cannon jumping</li>
-                <li>Control the center of the board</li>
+                <li>用士（仕）和象（相）保護你的將（帥）</li>
+                <li>利用車和炮發動強力攻擊</li>
+                <li>讓兵（卒）過河以獲得更大的靈活性</li>
+                <li>注意馬的蹩腳和炮的跳子</li>
+                <li>控制棋盤中央</li>
               </ul>
             </section>
           </div>

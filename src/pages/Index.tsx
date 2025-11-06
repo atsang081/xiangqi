@@ -96,7 +96,7 @@ const Index = () => {
         newGameState.isCheckmate = true;
         handleGameEnd(nextPlayer === playerSide ? 'loss' : 'win');
       } else {
-        toast.info(`${nextPlayer === playerSide ? 'You are' : 'AI is'} in check!`, {
+        toast.info(`${nextPlayer === playerSide ? '你被' : '電腦被'}將軍了！`, {
           icon: '⚠️',
         });
       }
@@ -130,9 +130,9 @@ const Index = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ wins: newWins, losses: newLosses }));
     
     if (result === 'win') {
-      toast.success('🎉 You won! Amazing!', { duration: 5000 });
+      toast.success('🎉 你贏了！太厲害了！', { duration: 5000 });
     } else if (result === 'loss') {
-      toast.error('Try again! You\'ll do better next time!', { duration: 5000 });
+      toast.error('再試一次！下次你會做得更好！', { duration: 5000 });
     }
   };
 
@@ -159,9 +159,9 @@ const Index = () => {
         setLastMove({ x, y });
         
         if (clickedPiece) {
-          toast.success('Great capture! 🎯');
+          toast.success('精彩的吃子！🎯');
         } else {
-          toast.success('Nice move!');
+          toast.success('好棋！');
         }
       } else if (clickedPiece && clickedPiece.side === playerSide) {
         // Select a different piece
@@ -194,7 +194,7 @@ const Index = () => {
 
   const handleUndo = () => {
     if (gameState.moveHistory.length < 2) {
-      toast.error('No moves to undo!');
+      toast.error('沒有可以悔棋的步數！');
       return;
     }
 
@@ -219,7 +219,7 @@ const Index = () => {
     });
     
     setLastMove(newHistory.length > 0 ? newHistory[newHistory.length - 1].to : null);
-    toast.info('Move undone!');
+    toast.info('已悔棋！');
   };
 
   const handleRestart = () => {
@@ -236,12 +236,12 @@ const Index = () => {
     });
     setGameResult(null);
     setLastMove(null);
-    toast.info('New game started!');
+    toast.info('新遊戲開始！');
   };
 
   const handleDifficultyChange = (level: number) => {
     setDifficulty(level);
-    toast.success(`Difficulty set to Level ${level}!`);
+    toast.success(`難度已設定為第${level}級！`);
   };
 
   const handleNewGame = () => {
@@ -255,8 +255,8 @@ const Index = () => {
       // AI makes first move
       setTimeout(() => makeAIMove(), 500);
     }
-    toast.success(`You're playing as ${side === 'red' ? 'Red' : 'Black'}!`, {
-      description: side === 'red' ? 'You move first!' : 'AI will move first!',
+    toast.success(`你選擇了${side === 'red' ? '紅方' : '黑方'}！`, {
+      description: side === 'red' ? '你先走！' : '電腦先走！',
     });
   };
 
@@ -265,20 +265,33 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background p-3 sm:p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
-            Chinese Chess
+        <div className="text-center mb-4 sm:mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2">
+            象棋對弈
           </h1>
-          <p className="text-lg text-muted-foreground">
-            {gameState.currentPlayer === playerSide ? "Your turn!" : "AI is thinking..."}
-            {gameState.isCheck && ` - Check!`}
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground">
+            {gameState.currentPlayer === playerSide ? "輪到你了！" : "電腦思考中..."}
+            {gameState.isCheck && ` - 將軍！`}
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
-          <div className="order-2 lg:order-1">
+        <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 items-center lg:items-start justify-center">
+          {/* Board - always first on mobile, second on desktop */}
+          <div className="order-1 w-full flex justify-center">
+            <GameBoard
+              board={gameState.board}
+              selectedPiece={gameState.selectedPiece}
+              validMoves={gameState.validMoves}
+              lastMove={lastMove}
+              playerSide={playerSide}
+              onSquareClick={handleSquareClick}
+            />
+          </div>
+
+          {/* Controls - below board on mobile, on side on desktop */}
+          <div className="order-2 w-full max-w-md lg:max-w-sm">
             <GameControls
               difficulty={difficulty}
               onDifficultyChange={handleDifficultyChange}
@@ -288,17 +301,6 @@ const Index = () => {
               canUndo={gameState.moveHistory.length >= 2}
               wins={wins}
               losses={losses}
-            />
-          </div>
-
-          <div className="order-1 lg:order-2">
-            <GameBoard
-              board={gameState.board}
-              selectedPiece={gameState.selectedPiece}
-              validMoves={gameState.validMoves}
-              lastMove={lastMove}
-              playerSide={playerSide}
-              onSquareClick={handleSquareClick}
             />
           </div>
         </div>

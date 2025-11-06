@@ -14,10 +14,10 @@ export function GamePiece({ piece, isSelected }: GamePieceProps) {
     <div
       className={`
         absolute inset-0 rounded-full flex items-center justify-center
-        font-bold text-2xl shadow-lg border-4 border-background
+        font-bold text-base sm:text-2xl shadow-lg border-2 sm:border-4 border-background
         piece-animate transition-all duration-200
         ${colorClass}
-        ${isSelected ? 'piece-selected ring-4 ring-accent' : 'hover:scale-105'}
+        ${isSelected ? 'piece-selected ring-2 sm:ring-4 ring-accent' : 'hover:scale-105 active:scale-95'}
       `}
     >
       {displayName}
