@@ -445,6 +445,29 @@ const Index = () => {
           </Button>
         </div>
 
+        {/* Footer with contact info, attribution, and copyright */}
+        <div className="mt-8 text-center text-xs text-muted-foreground space-y-1">
+          <p>
+            {language === 'en' 
+              ? 'Feedback: ' 
+              : '意見回饋：'}
+            <a 
+              href="mailto:cs@bitebite.app" 
+              className="text-primary hover:underline"
+            >
+              cs@bitebite.app
+            </a>
+          </p>
+          <p>
+            {language === 'en' 
+              ? 'Produced by Merlin Advisory Solution' 
+              : '由 Merlin Advisory Solution 製作'}
+          </p>
+          <p>
+            &copy; 2025 {language === 'en' ? 'All Rights Reserved' : '版權所有'}
+          </p>
+        </div>
+
         <RulesDialog open={showRules} onOpenChange={setShowRules} />
         <GameOverDialog 
           open={gameResult !== null} 
