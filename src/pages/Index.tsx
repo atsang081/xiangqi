@@ -11,11 +11,13 @@ import { GameOverDialog } from '@/components/game/GameOverDialog';
 import { SideSelection } from '@/components/game/SideSelection';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const STORAGE_KEY = 'xiangqi-stats';
 
 const Index = () => {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
   const [playerSide, setPlayerSide] = useState<PlayerSide | null>(null);
   const [gameState, setGameState] = useState<GameState>({
     board: createInitialBoard(),
@@ -118,7 +120,7 @@ const Index = () => {
       // In Xiangqi, stalemate is a loss for the stalemated player
       handleGameEnd(nextPlayer === playerSide ? 'loss' : 'win');
     } else if (inCheck) {
-      toast.info(`${nextPlayer === playerSide ? '你被' : '電腦被'}將軍了！`, {
+      toast.info(t.check, {
         icon: '⚠️',
       });
     }
@@ -151,9 +153,9 @@ const Index = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ wins: newWins, losses: newLosses }));
     
     if (result === 'win') {
-      toast.success('🎉 你贏了！太厲害了！', { duration: 5000 });
+      toast.success(`🎉 ${t.victory}`, { duration: 5000 });
     } else if (result === 'loss') {
-      toast.error('再試一次！下次你會做得更好！', { duration: 5000 });
+      toast.error(t.defeatMessage, { duration: 5000 });
     }
   };
 
@@ -180,9 +182,9 @@ const Index = () => {
         setLastMove({ x, y });
         
         if (clickedPiece) {
-          toast.success('精彩的吃子！🎯');
+          toast.success(`${t.greatMove} 🎯`);
         } else {
-          toast.success('好棋！');
+          toast.success(t.greatMove);
         }
       } else if (clickedPiece && clickedPiece.side === playerSide) {
         // Select a different piece
@@ -215,7 +217,7 @@ const Index = () => {
 
   const handleUndo = () => {
     if (gameState.moveHistory.length < 2) {
-      toast.error('沒有可以悔棋的步數！');
+      toast.error(t.undoLimit);
       return;
     }
 
@@ -240,7 +242,7 @@ const Index = () => {
     });
     
     setLastMove(newHistory.length > 0 ? newHistory[newHistory.length - 1].to : null);
-    toast.info('已悔棋！');
+    toast.info(t.undo);
   };
 
   const handleRestart = () => {
@@ -257,12 +259,12 @@ const Index = () => {
     });
     setGameResult(null);
     setLastMove(null);
-    toast.info('新遊戲開始！');
+    toast.info(t.restart);
   };
 
   const handleDifficultyChange = (level: number) => {
     setDifficulty(level);
-    toast.success(`難度已設定為第${level}級！`);
+    toast.success(`${t.level} ${level}`);
   };
 
   const handleNewGame = () => {
@@ -276,8 +278,10 @@ const Index = () => {
       // AI makes first move
       setTimeout(() => makeAIMove(), 500);
     }
-    toast.success(`你選擇了${side === 'red' ? '紅方' : '黑方'}！`, {
-      description: side === 'red' ? '你先走！' : '電腦先走！',
+    const sideText = side === 'red' ? t.playAsRed : t.playAsBlack;
+    const descText = side === 'red' ? t.yourTurn : t.computerThinking;
+    toast.success(sideText, {
+      description: descText,
     });
   };
 
@@ -290,11 +294,11 @@ const Index = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-4 sm:mb-6 md:mb-8">
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2">
-            象棋對弈
+            {language === 'en' ? 'Xiangqi' : '象棋對弈'}
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-muted-foreground">
-            {gameState.currentPlayer === playerSide ? "輪到你了！" : "小思思考中..."}
-            {gameState.isCheck && ` - 將軍！`}
+            {gameState.currentPlayer === playerSide ? t.yourTurn : t.computerThinking}
+            {gameState.isCheck && ` - ${t.check}`}
           </p>
         </div>
 
@@ -335,7 +339,7 @@ const Index = () => {
             variant="outline"
             className="bg-green-100 hover:bg-green-200 border-green-300 text-green-800"
           >
-            返回首頁
+            {language === 'en' ? 'Back to Home' : language === 'zh-CN' ? '返回首页' : '返回首頁'}
           </Button>
         </div>
 
