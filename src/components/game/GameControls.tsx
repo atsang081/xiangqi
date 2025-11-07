@@ -69,6 +69,7 @@ export function GameControls({
             <SelectItem value="3">第三級 - 中等 🌳</SelectItem>
             <SelectItem value="4">第四級 - 困難 🔥</SelectItem>
             <SelectItem value="5">第五級 - 專家 💪</SelectItem>
+            <SelectItem value="6">第六級 - 大師 🏆</SelectItem>
           </SelectContent>
         </Select>
       </div>

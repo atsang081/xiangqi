@@ -1,5 +1,5 @@
 import { Piece, Move, PlayerSide, Position } from './types';
-import { getValidMoves, isInCheck } from './moves';
+import { getValidMoves, isInCheck, isCheckmate, isStalemate } from './moves';
 import { copyBoard, BOARD_HEIGHT, BOARD_WIDTH } from './board';
 
 const PIECE_VALUES = {
@@ -10,6 +10,94 @@ const PIECE_VALUES = {
   chariot: 900,
   cannon: 450,
   soldier: 100,
+};
+
+// Positional values for better piece placement
+const POSITION_VALUES = {
+  general: [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ],
+  advisor: [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ],
+  elephant: [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 20, 0, 0, 0, 20, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 20, 0, 0, 0, 20, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ],
+  horse: [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 10, 0, 10, 0, 10, 0, 10, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 10, 0, 10, 0, 10, 0, 10, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 10, 0, 10, 0, 10, 0, 10, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 10, 0, 10, 0, 10, 0, 10, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ],
+  chariot: [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 10, 10, 10, 10, 10, 10, 10, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 10, 10, 10, 10, 10, 10, 10, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ],
+  cannon: [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 10, 10, 10, 10, 10, 10, 10, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 10, 10, 10, 10, 10, 10, 10, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ],
+  soldier: [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [20, 20, 20, 20, 20, 20, 20, 20, 20],
+    [25, 25, 25, 25, 25, 25, 25, 25, 25],
+    [25, 25, 25, 25, 25, 25, 25, 25, 25],
+    [30, 30, 30, 30, 30, 30, 30, 30, 30],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ],
 };
 
 export function getAIMove(
@@ -35,17 +123,22 @@ export function getAIMove(
 
   if (allMoves.length === 0) return null;
 
+  // Limit search depth for better performance
+  const maxDepth = Math.min(difficulty, 4);
+
   switch (difficulty) {
     case 1:
       return getRandomMove(allMoves);
     case 2:
       return getSimpleMove(allMoves, board);
     case 3:
-      return getTacticalMove(allMoves, board, side, 1);
-    case 4:
       return getTacticalMove(allMoves, board, side, 2);
+    case 4:
+      return getTacticalMove(allMoves, board, side, 3);
     case 5:
       return getTacticalMove(allMoves, board, side, 3);
+    case 6:
+      return getTacticalMove(allMoves, board, side, 4);
     default:
       return getRandomMove(allMoves);
   }
@@ -75,7 +168,8 @@ function getTacticalMove(
 
   for (const move of moves) {
     const newBoard = simulateMove(board, move);
-    const score = evaluatePosition(newBoard, side) + (Math.random() - 0.5) * 50;
+    // Use minimax with alpha-beta pruning for better move selection
+    const score = minimax(newBoard, depth, -Infinity, Infinity, false, side);
     
     if (score > bestScore) {
       bestScore = score;
@@ -84,6 +178,88 @@ function getTacticalMove(
   }
 
   return bestMove;
+}
+
+function minimax(
+  board: (Piece | null)[][],
+  depth: number,
+  alpha: number,
+  beta: number,
+  maximizing: boolean,
+  side: PlayerSide
+): number {
+  // Base case: reached maximum depth or game over
+  if (depth === 0) {
+    return evaluatePosition(board, side);
+  }
+
+  const currentSide: PlayerSide = maximizing ? side : (side === 'red' ? 'black' : 'red');
+  const pieces = getAllPieces(board, currentSide);
+  const allMoves: Move[] = [];
+
+  // Generate all possible moves
+  for (const piece of pieces) {
+    const validMoves = getValidMoves(piece, board);
+    for (const move of validMoves) {
+      const capturedPiece = board[move.y][move.x];
+      allMoves.push({
+        from: piece.position,
+        to: move,
+        piece,
+        capturedPiece: capturedPiece || undefined,
+      });
+    }
+  }
+
+  if (allMoves.length === 0) {
+    // No moves available - checkmate or stalemate
+    if (isInCheck(board)) {
+      // Checkmate
+      return maximizing ? -100000 : 100000;
+    } else {
+      // Stalemate
+      return 0;
+    }
+  }
+
+  // Early termination: If we find a winning move, take it immediately
+  if (depth >= 3) {
+    for (const move of allMoves) {
+      const newBoard = simulateMove(board, move);
+      if (isCheckmate(newBoard, side === 'red' ? 'black' : 'red')) {
+        // This is a checkmate move
+        return maximizing ? 100000 : -100000;
+      }
+    }
+  }
+
+  if (maximizing) {
+    let maxEval = -Infinity;
+    // Sort moves to improve alpha-beta pruning efficiency
+    allMoves.sort((a, b) => (b.capturedPiece ? 1 : 0) - (a.capturedPiece ? 1 : 0));
+    
+    for (const move of allMoves) {
+      const newBoard = simulateMove(board, move);
+      const evalScore = minimax(newBoard, depth - 1, alpha, beta, false, side);
+      maxEval = Math.max(maxEval, evalScore);
+      alpha = Math.max(alpha, evalScore);
+      if (beta <= alpha) break; // Alpha-beta pruning
+    }
+    return maxEval;
+  } else {
+    let minEval = Infinity;
+    // Sort moves to improve alpha-beta pruning efficiency
+    allMoves.sort((a, b) => (b.capturedPiece ? 1 : 0) - (a.capturedPiece ? 1 : 0));
+    
+    for (const move of allMoves) {
+      const newBoard = simulateMove(board, move);
+      const evalScore = minimax(newBoard, depth - 1, alpha, beta, true, side);
+      minEval = Math.min(minEval, evalScore);
+      beta = Math.min(beta, evalScore);
+      if (beta <= alpha) break; // Alpha-beta pruning
+    }
+    return minEval;
+  }
 }
 
 function simulateMove(board: (Piece | null)[][], move: Move): (Piece | null)[][] {
@@ -97,12 +273,14 @@ function evaluatePosition(board: (Piece | null)[][], side: PlayerSide): number {
   let score = 0;
   const enemySide: PlayerSide = side === 'red' ? 'black' : 'red';
 
+  // Simplified evaluation for better performance
   for (let y = 0; y < BOARD_HEIGHT; y++) {
     for (let x = 0; x < BOARD_WIDTH; x++) {
       const piece = board[y][x];
       if (!piece) continue;
 
       const value = PIECE_VALUES[piece.type];
+      
       if (piece.side === side) {
         score += value;
       } else {
@@ -111,12 +289,9 @@ function evaluatePosition(board: (Piece | null)[][], side: PlayerSide): number {
     }
   }
 
-  // Check penalty
-  if (isInCheck(board, side)) {
-    score -= 500;
-  }
-  if (isInCheck(board, enemySide)) {
-    score += 500;
+  // Check penalty (simplified)
+  if (isInCheck(board)) {
+    score -= 300;
   }
 
   return score;

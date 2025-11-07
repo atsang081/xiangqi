@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlayerSide, GameState, Move, Position } from '@/lib/xiangqi/types';
 import { createInitialBoard, copyBoard } from '@/lib/xiangqi/board';
-import { getValidMoves, isInCheck } from '@/lib/xiangqi/moves';
+import { getValidMoves, isInCheck, isCheckmate, isStalemate, isKingCaptured } from '@/lib/xiangqi/moves';
 import { getAIMove } from '@/lib/xiangqi/ai';
 import { GameBoard } from '@/components/game/GameBoard';
 import { GameControls } from '@/components/game/GameControls';
@@ -55,8 +55,8 @@ const Index = () => {
     setIsAIThinking(true);
     const aiSide: PlayerSide = playerSide === 'red' ? 'black' : 'red';
     
-    // Add delay based on difficulty for realism
-    const delay = difficulty <= 2 ? 800 : difficulty === 3 ? 1500 : difficulty === 4 ? 2500 : 4000;
+    // Reduce artificial delays for better responsiveness
+    const delay = difficulty <= 2 ? 300 : difficulty === 3 ? 500 : difficulty === 4 ? 800 : difficulty === 5 ? 1200 : 1500;
     
     setTimeout(() => {
       const aiMove = getAIMove(gameState.board, aiSide, difficulty);
@@ -76,7 +76,7 @@ const Index = () => {
     newBoard[move.from.y][move.from.x] = null;
 
     const nextPlayer: PlayerSide = gameState.currentPlayer === 'red' ? 'black' : 'red';
-    const inCheck = isInCheck(newBoard, nextPlayer);
+    const inCheck = isInCheck(newBoard);
 
     const newGameState: GameState = {
       board: newBoard,
@@ -92,17 +92,35 @@ const Index = () => {
       isStalemate: false,
     };
 
-    // Check for checkmate
-    if (inCheck) {
-      const hasValidMove = checkForValidMoves(newBoard, nextPlayer);
-      if (!hasValidMove) {
-        newGameState.isCheckmate = true;
-        handleGameEnd(nextPlayer === playerSide ? 'loss' : 'win');
-      } else {
-        toast.info(`${nextPlayer === playerSide ? '你被' : '電腦被'}將軍了！`, {
-          icon: '⚠️',
-        });
-      }
+    // Check if a king has been captured
+    if (isKingCaptured(newBoard, 'red')) {
+      // Red king captured - black wins
+      newGameState.isCheckmate = true;
+      handleGameEnd(playerSide === 'black' ? 'win' : 'loss');
+      setGameState(newGameState);
+      return;
+    }
+    
+    if (isKingCaptured(newBoard, 'black')) {
+      // Black king captured - red wins
+      newGameState.isCheckmate = true;
+      handleGameEnd(playerSide === 'red' ? 'win' : 'loss');
+      setGameState(newGameState);
+      return;
+    }
+
+    // Check for checkmate or stalemate
+    if (isCheckmate(newBoard, nextPlayer)) {
+      newGameState.isCheckmate = true;
+      handleGameEnd(nextPlayer === playerSide ? 'loss' : 'win');
+    } else if (isStalemate(newBoard, nextPlayer)) {
+      newGameState.isStalemate = true;
+      // In Xiangqi, stalemate is a loss for the stalemated player
+      handleGameEnd(nextPlayer === playerSide ? 'loss' : 'win');
+    } else if (inCheck) {
+      toast.info(`${nextPlayer === playerSide ? '你被' : '電腦被'}將軍了！`, {
+        icon: '⚠️',
+      });
     }
 
     setGameState(newGameState);
@@ -275,7 +293,7 @@ const Index = () => {
             象棋對弈
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-muted-foreground">
-            {gameState.currentPlayer === playerSide ? "輪到你了！" : "電腦思考中..."}
+            {gameState.currentPlayer === playerSide ? "輪到你了！" : "小思思考中..."}
             {gameState.isCheck && ` - 將軍！`}
           </p>
         </div>

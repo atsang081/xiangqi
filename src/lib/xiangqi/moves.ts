@@ -112,14 +112,14 @@ function getHorseMoves(piece: Piece, board: (Piece | null)[][]): Position[] {
   const moves: Position[] = [];
   const { x, y } = piece.position;
   const horseMoves = [
-    { dx: 1, dy: 2, blockX: 0, blockY: 1 },
-    { dx: 1, dy: -2, blockX: 0, blockY: -1 },
-    { dx: -1, dy: 2, blockX: 0, blockY: 1 },
-    { dx: -1, dy: -2, blockX: 0, blockY: -1 },
-    { dx: 2, dy: 1, blockX: 1, blockY: 0 },
-    { dx: 2, dy: -1, blockX: 1, blockY: 0 },
-    { dx: -2, dy: 1, blockX: -1, blockY: 0 },
-    { dx: -2, dy: -1, blockX: -1, blockY: 0 },
+    { dx: 1, dy: 2, blockX: 0, blockY: 1 },  // Right-Up
+    { dx: 1, dy: -2, blockX: 0, blockY: -1 }, // Right-Down
+    { dx: -1, dy: 2, blockX: 0, blockY: 1 },  // Left-Up
+    { dx: -1, dy: -2, blockX: 0, blockY: -1 }, // Left-Down
+    { dx: 2, dy: 1, blockX: 1, blockY: 0 },   // Up-Right
+    { dx: 2, dy: -1, blockX: 1, blockY: 0 },  // Up-Left
+    { dx: -2, dy: 1, blockX: -1, blockY: 0 }, // Down-Right
+    { dx: -2, dy: -1, blockX: -1, blockY: 0 }, // Down-Left
   ];
 
   for (const { dx, dy, blockX, blockY } of horseMoves) {
@@ -141,10 +141,10 @@ function getChariotMoves(piece: Piece, board: (Piece | null)[][]): Position[] {
   const moves: Position[] = [];
   const { x, y } = piece.position;
   const directions = [
-    { dx: 0, dy: 1 },
-    { dx: 0, dy: -1 },
-    { dx: 1, dy: 0 },
-    { dx: -1, dy: 0 },
+    { dx: 0, dy: 1 },   // Up
+    { dx: 0, dy: -1 },  // Down
+    { dx: 1, dy: 0 },   // Right
+    { dx: -1, dy: 0 },  // Left
   ];
 
   for (const { dx, dy } of directions) {
@@ -173,10 +173,10 @@ function getCannonMoves(piece: Piece, board: (Piece | null)[][]): Position[] {
   const moves: Position[] = [];
   const { x, y } = piece.position;
   const directions = [
-    { dx: 0, dy: 1 },
-    { dx: 0, dy: -1 },
-    { dx: 1, dy: 0 },
-    { dx: -1, dy: 0 },
+    { dx: 0, dy: 1 },   // Up
+    { dx: 0, dy: -1 },  // Down
+    { dx: 1, dy: 0 },   // Right
+    { dx: -1, dy: 0 },  // Left
   ];
 
   for (const { dx, dy } of directions) {
@@ -190,17 +190,26 @@ function getCannonMoves(piece: Piece, board: (Piece | null)[][]): Position[] {
       const targetPiece = board[newPos.y][newPos.x];
       
       if (!jumpedOver) {
+        // Non-capturing move - can only move to empty squares
         if (targetPiece) {
+          // Found a piece to jump over
           jumpedOver = true;
         } else {
+          // Can move to empty square
           moves.push(newPos);
         }
       } else {
+        // After jumping over a piece
         if (targetPiece) {
+          // Can capture if it's an enemy piece
           if (targetPiece.side !== piece.side) {
             moves.push(newPos);
           }
+          // Stop in either case (can't jump over more than one piece)
           break;
+        } else {
+          // Can't move to empty squares after jumping (unless capturing)
+          // This is intentionally left empty
         }
       }
       
@@ -255,23 +264,102 @@ function findGeneral(board: (Piece | null)[][], side: PlayerSide): Piece | null 
   return null;
 }
 
-export function isInCheck(board: (Piece | null)[][], side: PlayerSide): boolean {
-  const general = findGeneral(board, side);
-  if (!general) return false;
-
-  const enemySide: PlayerSide = side === 'red' ? 'black' : 'red';
-
+export function isInCheck(board: (Piece | null)[][]): boolean {
+  // Check if any piece is attacking the general
+  const redGeneral = findGeneral(board, 'red');
+  const blackGeneral = findGeneral(board, 'black');
+  
+  if (!redGeneral || !blackGeneral) return false;
+  
+  // Check if red general is in check
   for (let y = 0; y < BOARD_HEIGHT; y++) {
     for (let x = 0; x < BOARD_WIDTH; x++) {
       const piece = board[y][x];
-      if (piece && piece.side === enemySide) {
+      if (piece && piece.side === 'black') {
         const moves = getValidMoves(piece, board);
-        if (moves.some(move => move.x === general.position.x && move.y === general.position.y)) {
+        if (moves.some(move => move.x === redGeneral.position.x && move.y === redGeneral.position.y)) {
           return true;
         }
       }
     }
   }
-
+  
+  // Check if black general is in check
+  for (let y = 0; y < BOARD_HEIGHT; y++) {
+    for (let x = 0; x < BOARD_WIDTH; x++) {
+      const piece = board[y][x];
+      if (piece && piece.side === 'red') {
+        const moves = getValidMoves(piece, board);
+        if (moves.some(move => move.x === blackGeneral.position.x && move.y === blackGeneral.position.y)) {
+          return true;
+        }
+      }
+    }
+  }
+  
   return false;
+}
+
+export function isCheckmate(board: (Piece | null)[][], side: PlayerSide): boolean {
+  // First check if the side is in check
+  if (!isInCheck(board)) return false;
+  
+  // Check if the side has any legal moves
+  for (let y = 0; y < BOARD_HEIGHT; y++) {
+    for (let x = 0; x < BOARD_WIDTH; x++) {
+      const piece = board[y][x];
+      if (piece && piece.side === side) {
+        const moves = getValidMoves(piece, board);
+        // Try each move to see if it gets out of check
+        for (const move of moves) {
+          const newBoard = simulateMove(board, piece, move);
+          if (!isInCheck(newBoard)) {
+            // Found a move that gets out of check
+            return false;
+          }
+        }
+      }
+    }
+  }
+  
+  // No legal moves to get out of check - checkmate
+  return true;
+}
+
+export function isStalemate(board: (Piece | null)[][], side: PlayerSide): boolean {
+  // Check if the side is NOT in check
+  if (isInCheck(board)) return false;
+  
+  // Check if the side has any legal moves
+  for (let y = 0; y < BOARD_HEIGHT; y++) {
+    for (let x = 0; x < BOARD_WIDTH; x++) {
+      const piece = board[y][x];
+      if (piece && piece.side === side) {
+        const moves = getValidMoves(piece, board);
+        if (moves.length > 0) {
+          // Found at least one legal move
+          return false;
+        }
+      }
+    }
+  }
+  
+  // No legal moves and not in check - stalemate
+  return true;
+}
+
+export function isKingCaptured(board: (Piece | null)[][], side: PlayerSide): boolean {
+  // Check if the specified side's king is still on the board
+  return findGeneral(board, side) === null;
+}
+
+function simulateMove(board: (Piece | null)[][], piece: Piece, to: Position): (Piece | null)[][] {
+  const newBoard = board.map(row => row.map(p => p ? { ...p } : null));
+  const from = piece.position;
+  
+  // Move the piece
+  newBoard[to.y][to.x] = { ...piece, position: to };
+  newBoard[from.y][from.x] = null;
+  
+  return newBoard;
 }
