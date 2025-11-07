@@ -1,0 +1,210 @@
+export type Language = 'zh-TW' | 'zh-CN' | 'en';
+
+export const translations = {
+  'zh-TW': {
+    // Side Selection
+    selectSide: '選擇你的陣營',
+    playAsRed: '執紅方',
+    playAsBlack: '執黑方',
+    redGoesFirst: '紅方先行',
+    blackGoesFirst: '黑方先行',
+    selectLanguage: '選擇語言',
+    
+    // Game Controls
+    level: '難度等級',
+    veryEasy: '非常簡單',
+    easy: '簡單',
+    medium: '中等',
+    hard: '困難',
+    veryHard: '非常困難',
+    undo: '悔棋',
+    restart: '重新開始',
+    changeLevel: '更改難度',
+    rules: '遊戲規則',
+    yourTurn: '輪到你了！',
+    computerThinking: '電腦思考中...',
+    check: '將軍！',
+    wins: '勝',
+    losses: '敗',
+    
+    // Rules Dialog
+    xiangqiRules: '象棋規則',
+    basicRules: '基本規則',
+    basicRulesText: '象棋是一種兩人對弈的策略遊戲。紅方先行，雙方輪流移動棋子。目標是將死對方的將（帥）。',
+    piecesAndMoves: '棋子與走法',
+    general: '將/帥',
+    generalMove: '在九宮內直線移動一格',
+    advisor: '士/仕',
+    advisorMove: '在九宮內斜線移動一格',
+    elephant: '象/相',
+    elephantMove: '斜行兩格，不能過河，不能越子',
+    horse: '馬',
+    horseMove: '日字形移動，可被蹩腳',
+    chariot: '車',
+    chariotMove: '直線移動任意格數',
+    cannon: '炮',
+    cannonMove: '直線移動，吃子需要隔一子',
+    soldier: '兵/卒',
+    soldierMove: '未過河前只能前進，過河後可橫移',
+    close: '關閉',
+    
+    // Game Over Dialog
+    victory: '恭喜！你贏了！',
+    defeat: '電腦獲勝',
+    draw: '平局',
+    victoryMessage: '太棒了！你成功將死了對方！',
+    defeatMessage: '別灰心！再試一次吧！',
+    drawMessage: '這是一場勢均力敵的對局！',
+    playAgain: '再玩一次',
+    
+    // Toast Messages
+    invalidMove: '這步棋不合法',
+    greatMove: '好棋！',
+    tryAgain: '再想想！',
+    checkmate: '將死！',
+    undoLimit: '已達到悔棋次數上限',
+    
+    // Language Names
+    traditionalChinese: '繁體中文',
+    simplifiedChinese: '简体中文',
+    english: 'English',
+  },
+  'zh-CN': {
+    // Side Selection
+    selectSide: '选择你的阵营',
+    playAsRed: '执红方',
+    playAsBlack: '执黑方',
+    redGoesFirst: '红方先行',
+    blackGoesFirst: '黑方先行',
+    selectLanguage: '选择语言',
+    
+    // Game Controls
+    level: '难度等级',
+    veryEasy: '非常简单',
+    easy: '简单',
+    medium: '中等',
+    hard: '困难',
+    veryHard: '非常困难',
+    undo: '悔棋',
+    restart: '重新开始',
+    changeLevel: '更改难度',
+    rules: '游戏规则',
+    yourTurn: '轮到你了！',
+    computerThinking: '电脑思考中...',
+    check: '将军！',
+    wins: '胜',
+    losses: '败',
+    
+    // Rules Dialog
+    xiangqiRules: '象棋规则',
+    basicRules: '基本规则',
+    basicRulesText: '象棋是一种两人对弈的策略游戏。红方先行，双方轮流移动棋子。目标是将死对方的将（帅）。',
+    piecesAndMoves: '棋子与走法',
+    general: '将/帅',
+    generalMove: '在九宫内直线移动一格',
+    advisor: '士/仕',
+    advisorMove: '在九宫内斜线移动一格',
+    elephant: '象/相',
+    elephantMove: '斜行两格，不能过河，不能越子',
+    horse: '马',
+    horseMove: '日字形移动，可被蹩脚',
+    chariot: '车',
+    chariotMove: '直线移动任意格数',
+    cannon: '炮',
+    cannonMove: '直线移动，吃子需要隔一子',
+    soldier: '兵/卒',
+    soldierMove: '未过河前只能前进，过河后可横移',
+    close: '关闭',
+    
+    // Game Over Dialog
+    victory: '恭喜！你赢了！',
+    defeat: '电脑获胜',
+    draw: '平局',
+    victoryMessage: '太棒了！你成功将死了对方！',
+    defeatMessage: '别灰心！再试一次吧！',
+    drawMessage: '这是一场势均力敌的对局！',
+    playAgain: '再玩一次',
+    
+    // Toast Messages
+    invalidMove: '这步棋不合法',
+    greatMove: '好棋！',
+    tryAgain: '再想想！',
+    checkmate: '将死！',
+    undoLimit: '已达到悔棋次数上限',
+    
+    // Language Names
+    traditionalChinese: '繁體中文',
+    simplifiedChinese: '简体中文',
+    english: 'English',
+  },
+  'en': {
+    // Side Selection
+    selectSide: 'Choose Your Side',
+    playAsRed: 'Play as Red',
+    playAsBlack: 'Play as Black',
+    redGoesFirst: 'Red goes first',
+    blackGoesFirst: 'Black goes first',
+    selectLanguage: 'Select Language',
+    
+    // Game Controls
+    level: 'Level',
+    veryEasy: 'Very Easy',
+    easy: 'Easy',
+    medium: 'Medium',
+    hard: 'Hard',
+    veryHard: 'Very Hard',
+    undo: 'Undo',
+    restart: 'Restart',
+    changeLevel: 'Change Level',
+    rules: 'Rules',
+    yourTurn: "Your Turn!",
+    computerThinking: 'Computer Thinking...',
+    check: 'Check!',
+    wins: 'Wins',
+    losses: 'Losses',
+    
+    // Rules Dialog
+    xiangqiRules: 'Xiangqi Rules',
+    basicRules: 'Basic Rules',
+    basicRulesText: 'Xiangqi is a two-player strategy game. Red moves first, and players alternate turns. The goal is to checkmate the opponent\'s General.',
+    piecesAndMoves: 'Pieces and Moves',
+    general: 'General',
+    generalMove: 'Moves one point orthogonally within the palace',
+    advisor: 'Advisor',
+    advisorMove: 'Moves one point diagonally within the palace',
+    elephant: 'Elephant',
+    elephantMove: 'Moves two points diagonally, cannot cross river or jump',
+    horse: 'Horse',
+    horseMove: 'Moves in an L-shape, can be blocked',
+    chariot: 'Chariot',
+    chariotMove: 'Moves any distance orthogonally',
+    cannon: 'Cannon',
+    cannonMove: 'Moves like chariot, captures by jumping one piece',
+    soldier: 'Soldier',
+    soldierMove: 'Moves forward before crossing river, can move sideways after',
+    close: 'Close',
+    
+    // Game Over Dialog
+    victory: 'Congratulations! You Win!',
+    defeat: 'Computer Wins',
+    draw: 'Draw',
+    victoryMessage: 'Amazing! You checkmated the opponent!',
+    defeatMessage: 'Don\'t give up! Try again!',
+    drawMessage: 'That was an evenly matched game!',
+    playAgain: 'Play Again',
+    
+    // Toast Messages
+    invalidMove: 'Invalid move',
+    greatMove: 'Great move!',
+    tryAgain: 'Try again!',
+    checkmate: 'Checkmate!',
+    undoLimit: 'Undo limit reached',
+    
+    // Language Names
+    traditionalChinese: '繁體中文',
+    simplifiedChinese: '简体中文',
+    english: 'English',
+  },
+};
+
+export const getTranslation = (language: Language) => translations[language];
