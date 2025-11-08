@@ -25,7 +25,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Language } from '@/lib/translations';
-import { Globe, Users, Monitor } from 'lucide-react';
+import { Globe, Users, Monitor, Save } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -436,29 +436,41 @@ const Index = () => {
           </div>
           
           {gameMode === 'player' && (
-            <div className="bg-card rounded-xl p-4 shadow-lg border-2 border-border">
-              <h3 className="font-bold text-lg mb-3">{t.enterPlayerNames}</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-card rounded-lg p-3 shadow-sm border border-border/50">
+              <h3 className="font-medium text-sm mb-2 flex items-center gap-2">
+                <Users className="w-4 h-4 text-muted-foreground" />
+                {t.enterPlayerNames}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
-                  <label className="text-sm font-medium mb-1 block">{t.playerA} (Red)</label>
+                  <label className="text-xs font-normal mb-1 block text-muted-foreground flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-red-100 border border-red-200"></div>
+                    {t.playerA} (Red)
+                  </label>
                   <Input
                     value={playerNames.red}
                     onChange={(e) => setPlayerNames({...playerNames, red: e.target.value})}
                     placeholder={t.playerA}
+                    className="h-8 text-sm border-red-200 focus:border-red-300 focus:ring-red-100 focus:ring-2 bg-red-50/30"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1 block">{t.playerB} (Black)</label>
+                  <label className="text-xs font-normal mb-1 block text-muted-foreground flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-blue-100 border border-blue-200"></div>
+                    {t.playerB} (Black)
+                  </label>
                   <Input
                     value={playerNames.black}
                     onChange={(e) => setPlayerNames({...playerNames, black: e.target.value})}
                     placeholder={t.playerB}
+                    className="h-8 text-sm border-blue-200 focus:border-blue-300 focus:ring-blue-100 focus:ring-2 bg-blue-50/30"
                   />
                 </div>
               </div>
               <Button 
                 onClick={handleSavePlayerNames} 
-                className="w-full mt-4"
+                className="w-full mt-3 h-8 text-sm bg-gradient-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 border border-purple-200 text-purple-800"
+                variant="outline"
               >
                 {t.saveNames}
               </Button>
