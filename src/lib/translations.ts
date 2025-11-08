@@ -10,6 +10,19 @@ export const translations = {
     blackGoesFirst: '黑方先行',
     selectLanguage: '選擇語言',
     
+    // Game Mode Selection
+    selectMode: '選擇遊戲模式',
+    playVsComputer: '與電腦對戰',
+    playVsPlayer: '玩家對戰',
+    enterPlayerNames: '輸入玩家名稱',
+    playerA: '玩家 A',
+    playerB: '玩家 B',
+    saveNames: '儲存名稱',
+    computer: '電腦',
+    player: '玩家',
+    namesSaved: '玩家名稱已儲存',
+    currentPlayerTurn: '輪到',
+    
     // Game Controls
     level: '難度等級',
     veryEasy: '非常簡單',
@@ -78,6 +91,19 @@ export const translations = {
     blackGoesFirst: '黑方先行',
     selectLanguage: '选择语言',
     
+    // Game Mode Selection
+    selectMode: '选择游戏模式',
+    playVsComputer: '与电脑对战',
+    playVsPlayer: '玩家对战',
+    enterPlayerNames: '输入玩家名称',
+    playerA: '玩家 A',
+    playerB: '玩家 B',
+    saveNames: '保存名称',
+    computer: '电脑',
+    player: '玩家',
+    namesSaved: '玩家名称已保存',
+    currentPlayerTurn: '轮到',
+    
     // Game Controls
     level: '难度等级',
     veryEasy: '非常简单',
@@ -145,6 +171,19 @@ export const translations = {
     redGoesFirst: 'Red goes first',
     blackGoesFirst: 'Black goes first',
     selectLanguage: 'Select Language',
+    
+    // Game Mode Selection
+    selectMode: 'Select Game Mode',
+    playVsComputer: 'Play vs Computer',
+    playVsPlayer: 'Play vs Player',
+    enterPlayerNames: 'Enter Player Names',
+    playerA: 'Player A',
+    playerB: 'Player B',
+    saveNames: 'Save Names',
+    computer: 'Computer',
+    player: 'Player',
+    namesSaved: 'Player names saved',
+    currentPlayerTurn: 'Current turn:',
     
     // Game Controls
     level: 'Level',

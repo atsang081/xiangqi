@@ -22,9 +22,10 @@ import { GameOverDialog } from '@/components/game/GameOverDialog';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Language } from '@/lib/translations';
-import { Globe } from 'lucide-react';
+import { Globe, Users, Monitor } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +34,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const STORAGE_KEY = 'xiangqi-stats';
+const MODE_STORAGE_KEY = 'xiangqi-mode';
+const PLAYER_NAMES_STORAGE_KEY = 'xiangqi-player-names';
 
 const Index = () => {
   const { language, setLanguage, t } = useLanguage();
@@ -55,6 +58,9 @@ const Index = () => {
   const [wins, setWins] = useState(0);
   const [losses, setLosses] = useState(0);
   const [isAIThinking, setIsAIThinking] = useState(false);
+  const [gameMode, setGameMode] = useState<'computer' | 'player'>('computer');
+  const [playerNames, setPlayerNames] = useState({ red: 'Player A', black: 'Player B' });
+  const [showNameInputs, setShowNameInputs] = useState(false);
 
   useEffect(() => {
     const stats = localStorage.getItem(STORAGE_KEY);
@@ -66,12 +72,27 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    if (playerSide && gameState.currentPlayer !== playerSide && !gameState.isCheckmate && !isAIThinking) {
+    const savedMode = localStorage.getItem(MODE_STORAGE_KEY);
+    if (savedMode === 'player') {
+      setGameMode('player');
+    }
+    
+    const savedPlayerNames = localStorage.getItem(PLAYER_NAMES_STORAGE_KEY);
+    if (savedPlayerNames) {
+      setPlayerNames(JSON.parse(savedPlayerNames));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (gameMode === 'computer' && playerSide && gameState.currentPlayer !== playerSide && !gameState.isCheckmate && !isAIThinking) {
       makeAIMove();
     }
-  }, [gameState.currentPlayer, playerSide, gameState.isCheckmate, isAIThinking]);
+  }, [gameState.currentPlayer, playerSide, gameState.isCheckmate, isAIThinking, gameMode]);
 
   const makeAIMove = async () => {
+    // Only make AI moves in computer mode
+    if (gameMode !== 'computer') return;
+    
     setIsAIThinking(true);
     const aiSide: PlayerSide = playerSide === 'red' ? 'black' : 'red';
     
@@ -116,7 +137,12 @@ const Index = () => {
     if (isKingCaptured(newBoard, 'red')) {
       // Red king captured - black wins
       newGameState.isCheckmate = true;
-      handleGameEnd(playerSide === 'black' ? 'win' : 'loss');
+      if (gameMode === 'computer') {
+        handleGameEnd(playerSide === 'black' ? 'win' : 'loss');
+      } else {
+        // In player mode, black player wins
+        handleGameEnd('win');
+      }
       setGameState(newGameState);
       return;
     }
@@ -124,7 +150,12 @@ const Index = () => {
     if (isKingCaptured(newBoard, 'black')) {
       // Black king captured - red wins
       newGameState.isCheckmate = true;
-      handleGameEnd(playerSide === 'red' ? 'win' : 'loss');
+      if (gameMode === 'computer') {
+        handleGameEnd(playerSide === 'red' ? 'win' : 'loss');
+      } else {
+        // In player mode, red player wins
+        handleGameEnd('loss');
+      }
       setGameState(newGameState);
       return;
     }
@@ -132,11 +163,21 @@ const Index = () => {
     // Check for checkmate or stalemate
     if (isCheckmate(newBoard, nextPlayer)) {
       newGameState.isCheckmate = true;
-      handleGameEnd(nextPlayer === playerSide ? 'loss' : 'win');
+      if (gameMode === 'computer') {
+        handleGameEnd(nextPlayer === playerSide ? 'loss' : 'win');
+      } else {
+        // In player mode, the player who is in checkmate loses
+        handleGameEnd(nextPlayer === 'red' ? 'loss' : 'win');
+      }
     } else if (isStalemate(newBoard, nextPlayer)) {
       newGameState.isStalemate = true;
       // In Xiangqi, stalemate is a loss for the stalemated player
-      handleGameEnd(nextPlayer === playerSide ? 'loss' : 'win');
+      if (gameMode === 'computer') {
+        handleGameEnd(nextPlayer === playerSide ? 'loss' : 'win');
+      } else {
+        // In player mode, the player who is stalemated loses
+        handleGameEnd(nextPlayer === 'red' ? 'loss' : 'win');
+      }
     } else if (inCheck) {
       toast.info(t.check, {
         icon: '⚠️',
@@ -162,23 +203,36 @@ const Index = () => {
   const handleGameEnd = (result: 'win' | 'loss' | 'draw') => {
     setGameResult(result);
     
-    const newWins = result === 'win' ? wins + 1 : wins;
-    const newLosses = result === 'loss' ? losses + 1 : losses;
-    
-    setWins(newWins);
-    setLosses(newLosses);
-    
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ wins: newWins, losses: newLosses }));
+    // Only update win/loss stats in computer mode
+    if (gameMode === 'computer') {
+      const newWins = result === 'win' ? wins + 1 : wins;
+      const newLosses = result === 'loss' ? losses + 1 : losses;
+      
+      setWins(newWins);
+      setLosses(newLosses);
+      
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ wins: newWins, losses: newLosses }));
+    }
     
     if (result === 'win') {
       toast.success(`🎉 ${t.victory}`, { duration: 5000 });
     } else if (result === 'loss') {
-      toast.error(t.defeatMessage, { duration: 5000 });
+      if (gameMode === 'computer') {
+        toast.error(t.defeatMessage, { duration: 5000 });
+      } else {
+        // In player mode, show who won
+        const winner = gameState.currentPlayer === 'red' ? playerNames.black : playerNames.red;
+        toast.success(`${winner} ${t.victory}`, { duration: 5000 });
+      }
     }
   };
 
   const handleSquareClick = (x: number, y: number) => {
-    if (gameState.currentPlayer !== playerSide || gameState.isCheckmate || isAIThinking) return;
+    // In computer mode, only allow player to move when it's their turn and AI is not thinking
+    if (gameMode === 'computer' && (gameState.currentPlayer !== playerSide || gameState.isCheckmate || isAIThinking)) return;
+    
+    // In player mode, allow both players to move when it's not checkmate
+    if (gameMode === 'player' && gameState.isCheckmate) return;
 
     const clickedPiece = gameState.board[y][x];
 
@@ -204,7 +258,9 @@ const Index = () => {
         } else {
           toast.success(t.greatMove);
         }
-      } else if (clickedPiece && clickedPiece.side === playerSide) {
+      } else if (clickedPiece && 
+                 ((gameMode === 'computer' && clickedPiece.side === playerSide) || 
+                  (gameMode === 'player' && clickedPiece.side === gameState.currentPlayer))) {
         // Select a different piece
         const moves = getValidMoves(clickedPiece, gameState.board);
         setGameState({
@@ -222,7 +278,9 @@ const Index = () => {
       }
     } else {
       // Select a piece
-      if (clickedPiece && clickedPiece.side === playerSide) {
+      if (clickedPiece && 
+          ((gameMode === 'computer' && clickedPiece.side === playerSide) || 
+           (gameMode === 'player' && clickedPiece.side === gameState.currentPlayer))) {
         const moves = getValidMoves(clickedPiece, gameState.board);
         setGameState({
           ...gameState,
@@ -292,22 +350,63 @@ const Index = () => {
 
   const handleSelectSide = (side: PlayerSide) => {
     setPlayerSide(side);
-    if (side === 'black') {
+    if (gameMode === 'computer' && side === 'black') {
       // AI makes first move
       setTimeout(() => makeAIMove(), 500);
     }
     const sideText = side === 'red' ? t.playAsRed : t.playAsBlack;
-    const descText = side === 'red' ? t.yourTurn : t.computerThinking;
+    const descText = gameMode === 'computer' 
+      ? (side === 'red' ? t.yourTurn : t.computerThinking)
+      : t.selectSide;
     toast.success(sideText, {
       description: descText,
     });
+  };
+
+  const handleModeChange = (mode: 'computer' | 'player') => {
+    setGameMode(mode);
+    localStorage.setItem(MODE_STORAGE_KEY, mode);
+    toast.success(`${t.selectMode}: ${mode === 'computer' ? t.playVsComputer : t.playVsPlayer}`);
+  };
+
+  const handleNameChange = (side: PlayerSide, name: string) => {
+    setPlayerNames(prevNames => ({
+      ...prevNames,
+      [side]: name,
+    }));
+  };
+
+  const handleSavePlayerNames = () => {
+    localStorage.setItem(PLAYER_NAMES_STORAGE_KEY, JSON.stringify(playerNames));
+    setShowNameInputs(false);
+    toast.success(t.namesSaved);
   };
 
   if (!playerSide) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center space-y-6 sm:space-y-8 max-w-4xl w-full">
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex gap-2">
+              <Button 
+                variant={gameMode === 'computer' ? "default" : "outline"} 
+                size="sm" 
+                className="gap-2"
+                onClick={() => handleModeChange('computer')}
+              >
+                <Monitor className="h-4 w-4" />
+                {t.playVsComputer}
+              </Button>
+              <Button 
+                variant={gameMode === 'player' ? "default" : "outline"} 
+                size="sm" 
+                className="gap-2"
+                onClick={() => handleModeChange('player')}
+              >
+                <Users className="h-4 w-4" />
+                {t.playVsPlayer}
+              </Button>
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2">
@@ -328,6 +427,37 @@ const Index = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+          
+          {gameMode === 'player' && (
+            <div className="bg-card rounded-xl p-4 shadow-lg border-2 border-border">
+              <h3 className="font-bold text-lg mb-3">{t.enterPlayerNames}</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">{t.playerA} (Red)</label>
+                  <Input
+                    value={playerNames.red}
+                    onChange={(e) => setPlayerNames({...playerNames, red: e.target.value})}
+                    placeholder={t.playerA}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">{t.playerB} (Black)</label>
+                  <Input
+                    value={playerNames.black}
+                    onChange={(e) => setPlayerNames({...playerNames, black: e.target.value})}
+                    placeholder={t.playerB}
+                  />
+                </div>
+              </div>
+              <Button 
+                onClick={handleSavePlayerNames} 
+                className="w-full mt-4"
+              >
+                {t.saveNames}
+              </Button>
+            </div>
+          )}
+          
           <div className="space-y-2">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-2">
               {language === 'en' ? 'Xiangqi' : '象棋對弈'}
@@ -348,13 +478,13 @@ const Index = () => {
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-piece-red">{language === 'en' ? 'Red' : '紅方'}</h2>
                 <p className="text-sm sm:text-base text-muted-foreground">
-                  {t.redGoesFirst}
+                  {gameMode === 'computer' ? t.redGoesFirst : `${t.playerA} ${t.redGoesFirst}`}
                 </p>
                 <Button 
                   size="lg" 
                   className="w-full h-11 sm:h-12 text-base sm:text-lg bg-piece-red hover:bg-piece-red/90"
                 >
-                  {t.playAsRed}
+                  {gameMode === 'computer' ? t.playAsRed : `${t.playAsRed} (${playerNames.red})`}
                 </Button>
               </div>
             </Card>
@@ -369,13 +499,13 @@ const Index = () => {
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-piece-black">{language === 'en' ? 'Black' : '黑方'}</h2>
                 <p className="text-sm sm:text-base text-muted-foreground">
-                  {t.blackGoesFirst}
+                  {gameMode === 'computer' ? t.blackGoesFirst : `${t.playerB} ${t.blackGoesFirst}`}
                 </p>
                 <Button 
                   size="lg" 
                   className="w-full h-11 sm:h-12 text-base sm:text-lg bg-piece-black hover:bg-piece-black/90"
                 >
-                  {t.playAsBlack}
+                  {gameMode === 'computer' ? t.playAsBlack : `${t.playAsBlack} (${playerNames.black})`}
                 </Button>
               </div>
             </Card>
@@ -422,7 +552,9 @@ const Index = () => {
             {language === 'en' ? 'Xiangqi' : '象棋對弈'}
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-muted-foreground">
-            {gameState.currentPlayer === playerSide ? t.yourTurn : t.computerThinking}
+            {gameMode === 'computer' 
+              ? (gameState.currentPlayer === playerSide ? t.yourTurn : t.computerThinking)
+              : `${t.currentPlayerTurn} ${gameState.currentPlayer === 'red' ? playerNames.red : playerNames.black}`}
             {gameState.isCheck && ` - ${t.check}`}
           </p>
         </div>
