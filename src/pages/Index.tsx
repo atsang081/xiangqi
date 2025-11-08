@@ -582,6 +582,7 @@ const Index = () => {
           {/* Controls - below board on mobile, on side on desktop */}
           <div className="order-2 w-full max-w-md lg:max-w-sm">
             <GameControls
+              gameMode={gameMode}
               difficulty={difficulty}
               onDifficultyChange={handleDifficultyChange}
               onUndo={handleUndo}
