@@ -16,6 +16,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface GameControlsProps {
+  gameMode?: 'computer' | 'player';
   difficulty: number;
   onDifficultyChange: (level: number) => void;
   onUndo: () => void;
@@ -27,6 +28,7 @@ interface GameControlsProps {
 }
 
 export function GameControls({
+  gameMode = 'computer',
   difficulty,
   onDifficultyChange,
   onUndo,
@@ -66,24 +68,26 @@ export function GameControls({
         </div>
       </div>
 
-      <div className="bg-card rounded-xl p-4 sm:p-6 shadow-lg border-2 border-border">
-        <div className="flex items-center gap-2 mb-3 sm:mb-4">
-          <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
-          <h3 className="font-bold text-base sm:text-lg">{t.level}</h3>
+      {gameMode === 'computer' && (
+        <div className="bg-card rounded-xl p-4 sm:p-6 shadow-lg border-2 border-border">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
+            <h3 className="font-bold text-base sm:text-lg">{t.level}</h3>
+          </div>
+          <Select value={difficulty.toString()} onValueChange={(v) => onDifficultyChange(parseInt(v))}>
+            <SelectTrigger className="w-full h-10 sm:h-11">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {difficultyLabels.map((label, index) => (
+                <SelectItem key={index + 1} value={(index + 1).toString()}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={difficulty.toString()} onValueChange={(v) => onDifficultyChange(parseInt(v))}>
-          <SelectTrigger className="w-full h-10 sm:h-11">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {difficultyLabels.map((label, index) => (
-              <SelectItem key={index + 1} value={(index + 1).toString()}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      )}
 
       <div className="space-y-2">
         <Button 

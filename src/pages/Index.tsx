@@ -350,6 +350,13 @@ const Index = () => {
 
   const handleSelectSide = (side: PlayerSide) => {
     setPlayerSide(side);
+    
+    // Reset win/loss counters for PvP mode
+    if (gameMode === 'player') {
+      setWins(0);
+      setLosses(0);
+    }
+    
     if (gameMode === 'computer' && side === 'black') {
       // AI makes first move
       setTimeout(() => makeAIMove(), 500);
